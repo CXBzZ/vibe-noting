@@ -8,9 +8,9 @@ function createWindow() {
     width: 350,
     height: 600,
     alwaysOnTop: true, // 核心：始终置顶
-    autoHideMenuBar: true, // 隐藏菜单栏，看起来更像纯净的便签
-    frame: false, // 无边框模式（可选，如果你想要完全自定义的标题栏，这里设为 false。为了方便拖拽，我们先保留系统边框，但隐藏菜单）
-    titleBarStyle: 'hidden', // 隐藏默认标题栏，但保留窗口控制按钮（Windows 11 效果很好）
+    autoHideMenuBar: true, // 隐藏菜单栏
+    titleBarStyle: 'hidden', // 隐藏默认标题栏，保留控制按钮（Mac 的红绿灯，Win 的最小化/关闭）
+    trafficLightPosition: { x: 16, y: 16 }, // Mac 红绿灯位置优化
     titleBarOverlay: {
       color: '#09090b',
       symbolColor: '#eab308',

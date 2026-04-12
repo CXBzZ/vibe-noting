@@ -290,9 +290,12 @@ export default function App() {
   const MainUI = (
     <div className="flex flex-col h-full w-full max-w-md mx-auto bg-zinc-950 text-zinc-50 font-sans shadow-2xl overflow-hidden sm:border sm:border-zinc-800 sm:rounded-2xl">
       {/* Header */}
-      <div className="flex flex-col border-b border-zinc-800/50 bg-zinc-900/80 backdrop-blur-xl sticky top-0 z-10">
+      <div 
+        className="flex flex-col border-b border-zinc-800/50 bg-zinc-900/80 backdrop-blur-xl sticky top-0 z-10"
+        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+      >
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
             <div className="flex p-1 bg-zinc-800/50 rounded-lg">
               <button
                 onClick={() => setActiveTab('todo')}
@@ -316,7 +319,7 @@ export default function App() {
               </button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
             {deferredPrompt && (
               <button
                 onClick={handleInstall}
