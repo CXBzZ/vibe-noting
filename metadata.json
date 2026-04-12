@@ -1,0 +1,5 @@
+{
+  "name": "Floating Notes",
+  "description": "A cross-platform, always-on-top sticky note and todo widget.",
+  "requestFramePermissions": []
+}
