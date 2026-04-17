@@ -1,21 +1,33 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
 
+if (isDev) {
+  app.setPath('userData', path.join(app.getPath('userData'), 'electron-dev'));
+}
+
+const NORMAL_SIZE = { width: 350, height: 600 };
+const FOCUS_SIZE = { width: 320, height: 48 };
+
+let mainWindow = null;
+
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 350,
-    height: 600,
-    alwaysOnTop: true, // 核心：始终置顶
-    autoHideMenuBar: true, // 隐藏菜单栏
-    titleBarStyle: 'hidden', // 隐藏默认标题栏，保留控制按钮（Mac 的红绿灯，Win 的最小化/关闭）
-    trafficLightPosition: { x: 16, y: 16 }, // Mac 红绿灯位置优化
+  mainWindow = new BrowserWindow({
+    ...NORMAL_SIZE,
+    alwaysOnTop: true,
+    autoHideMenuBar: true,
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 12, y: 10 },
     titleBarOverlay: {
       color: '#09090b',
-      symbolColor: '#eab308',
-      height: 40
+      symbolColor: '#a1a1aa',
+      height: 36
     },
+    backgroundColor: '#09090b',
+    vibrancy: undefined,
+    hasShadow: true,
+    roundedCorners: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -23,13 +35,33 @@ function createWindow() {
   });
 
   if (isDev) {
-    // 开发环境下加载 Vite 本地服务
-    win.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:3000');
   } else {
-    // 生产环境下加载打包后的静态文件
-    win.loadFile(path.join(__dirname, 'dist', 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
   }
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
+
+ipcMain.on('enter-focus-mode', () => {
+  if (!mainWindow) return;
+  if (mainWindow.setWindowButtonVisibility) mainWindow.setWindowButtonVisibility(false);
+  mainWindow.setResizable(false);
+  mainWindow.setSize(FOCUS_SIZE.width, FOCUS_SIZE.height, true);
+  mainWindow.setOpacity(0.5);
+  mainWindow.setAlwaysOnTop(true, 'floating');
+});
+
+ipcMain.on('exit-focus-mode', () => {
+  if (!mainWindow) return;
+  if (mainWindow.setWindowButtonVisibility) mainWindow.setWindowButtonVisibility(true);
+  mainWindow.setResizable(true);
+  mainWindow.setOpacity(1.0);
+  mainWindow.setSize(NORMAL_SIZE.width, NORMAL_SIZE.height, true);
+  mainWindow.setAlwaysOnTop(true);
+});
 
 app.whenReady().then(() => {
   createWindow();
