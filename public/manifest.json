@@ -2,10 +2,12 @@
   "name": "极简悬浮笔记",
   "short_name": "悬浮笔记",
   "description": "一个跨平台、始终置顶的便签与灵感记录工具。",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#09090b",
-  "theme_color": "#eab308",
+  "theme_color": "#09090b",
   "icons": [
     {
       "src": "https://picsum.photos/seed/notes/192/192",

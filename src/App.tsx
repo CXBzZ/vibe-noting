@@ -3,13 +3,14 @@ import { createPortal } from 'react-dom';
 import {
   Plus, Trash2, Check, ExternalLink, X, ListTodo, Lightbulb,
   MessageSquareQuote, LogOut, LogIn, Loader2, Crosshair, Maximize2,
-  ChevronLeft, ChevronRight, Sparkles, GripVertical,
+  ChevronLeft, ChevronRight, Sparkles, GripVertical, MessageSquare,
 } from 'lucide-react';
 import { Reorder } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import { WechatBind } from './components/WechatBind';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -36,6 +37,7 @@ const ipcRenderer = (() => {
 })();
 
 const isElectronEnv = navigator.userAgent.toLowerCase().includes(' electron/');
+const supportsDocPip = typeof window !== 'undefined' && 'documentPictureInPicture' in window;
 
 const thoughtCategories: { id: ThoughtCategory; label: string }[] = [
   { id: 'general', label: '全部' },
@@ -62,6 +64,7 @@ export default function App() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showWechatBind, setShowWechatBind] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [focusIndex, setFocusIndex] = useState(0);
   const [todoOrder, setTodoOrder] = useState<string[]>(() => {
@@ -380,9 +383,14 @@ export default function App() {
                 <Plus size={14} />
               </button>
             )}
-            {!isElectronEnv && (
+            {!isElectronEnv && supportsDocPip && (
               <button onClick={togglePip} className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors" title={isPip ? "关闭悬浮窗" : "开启悬浮窗"}>
                 {isPip ? <X size={14} /> : <ExternalLink size={14} />}
+              </button>
+            )}
+            {session && !isElectronEnv && (
+              <button onClick={() => setShowWechatBind(true)} className="p-1.5 rounded-lg text-zinc-500 hover:text-green-400 hover:bg-zinc-800/50 transition-colors" title="微信绑定">
+                <MessageSquare size={14} />
               </button>
             )}
             {session && activeTab === 'todo' && orderedTodos.length > 0 && (
@@ -564,7 +572,10 @@ export default function App() {
 
       {/* ── Input ── */}
       {session && (
-        <div className="shrink-0 px-3 py-2.5 border-t border-zinc-800/40">
+        <div
+          className="shrink-0 px-3 pt-2.5 border-t border-zinc-800/40"
+          style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}
+        >
           <form onSubmit={addEntry} className="relative flex items-center">
             <input
               ref={inputRef}
@@ -583,6 +594,11 @@ export default function App() {
             </button>
           </form>
         </div>
+      )}
+
+      {/* ── WeChat Bind Panel ── */}
+      {showWechatBind && session?.user?.id && (
+        <WechatBind userId={session.user.id} onClose={() => setShowWechatBind(false)} />
       )}
 
       {/* ── Delete All Todos Modal ── */}
